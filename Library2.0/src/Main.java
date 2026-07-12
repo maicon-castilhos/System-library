@@ -22,9 +22,23 @@ public class Main {
 		System.out.print("E-mail: ");
 		String email = sc.nextLine();
 
-		System.out.print("Level: ");
-		String memberLevel = sc.next();
-		Member member = new Member(name, email, MemberLevel.valueOf(memberLevel));
+		System.out.print("Enter level: 1.BASIC or 2.PREMIUM: ");
+		int levelChoice = sc.nextInt();
+		
+		MemberLevel level = null;
+		switch (levelChoice) {
+		case 1:
+			level = MemberLevel.BASIC;
+			break;
+		case 2: 
+			level = MemberLevel.PREMIUM;
+			break;
+			default:
+				System.out.print("Option invalid, refresh and try again, setting basic as default");
+				level = MemberLevel.BASIC;
+		}
+		Member member = new Member(name, email, level);
+		
 		System.out.print("How many loan to this client? ");
 		int n = sc.nextInt();
 		sc.nextLine();
