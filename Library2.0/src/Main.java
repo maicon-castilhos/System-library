@@ -1,5 +1,7 @@
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.InputMismatchException;
 import java.util.Locale;
 import java.util.Scanner;
 
@@ -13,60 +15,67 @@ public class Main {
 	public static void main(String[] args) {
 		Locale.setDefault(Locale.US);
 		Scanner sc = new Scanner(System.in);
+		try {
+			System.out.println("Enter data of client: ");
+			System.out.print("Name: ");
+			String name = sc.nextLine();
 
+			System.out.print("E-mail: ");
+			String email = sc.nextLine();
+			MemberLevel level = null;
 
-		System.out.println("Enter data of client: ");
-		System.out.print("Name: ");
-		String name = sc.nextLine();
-
-		System.out.print("E-mail: ");
-		String email = sc.nextLine();
-
-		System.out.print("Enter level: 1.BASIC or 2.PREMIUM: ");
-		int levelChoice = sc.nextInt();
-		
-		MemberLevel level = null;
-		switch (levelChoice) {
-		case 1:
-			level = MemberLevel.BASIC;
-			break;
-		case 2: 
-			level = MemberLevel.PREMIUM;
-			break;
-			default:
-				System.out.print("Option invalid, refresh and try again, setting basic as default");
+			System.out.print("Enter level: 1.BASIC or 2.PREMIUM: ");
+			int levelChoice = sc.nextInt();
+			sc.nextLine();
+			switch (levelChoice) {
+			case 1:
 				level = MemberLevel.BASIC;
+				break;
+			case 2:
+				level = MemberLevel.PREMIUM;
+				break;
+			default:
+				System.out.println("Option invalid, setting basic as default (Basic)");
+				level = MemberLevel.BASIC;
+			}
+			Member member = new Member(name, email, level);
+			System.out.print("How many loan to this client? ");
+			int n = sc.nextInt();
+			sc.nextLine();
+
+			for (int i = 0; i < n; i++) {
+				System.out.println("Enter loan #" + (i + 1) + " data ");
+				System.out.print("Title? ");
+				String title = sc.nextLine();
+				System.out.print("Author? ");
+				String author = sc.nextLine();
+				System.out.print("Price per day? ");
+				double pricePerDay = sc.nextDouble();
+				sc.nextLine(); // ← consome o \n após nextDouble
+				System.out.print("Date for get book? (DD/MM/YYYY): ");
+				LocalDate startDate = LocalDate.parse(sc.next(), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+				System.out.print("Date for return book? (DD/MM/YYYY): ");
+				LocalDate due = LocalDate.parse(sc.next(), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+				sc.nextLine(); // ← consome o \n após o último sc.next()
+
+				Book book = new Book(title, author, pricePerDay);
+				Loan loan = new Loan(startDate, due, book);
+				member.addLoan(loan);
+
+			}
+
+			System.out.println(member); // chama o toString do Member
+
+			for (Loan loan : member.getLoan()) {
+				System.out.println(loan); // chama o toString do Loan
+			}
+
+
+		} catch (InputMismatchException e) {
+			System.out.print("This option accepts only numbers, refresh and try again.");
 		}
-		Member member = new Member(name, email, level);
-		
-		System.out.print("How many loan to this client? ");
-		int n = sc.nextInt();
-		sc.nextLine();
-
-		for (int i = 0; i < n; i++) {
-		    System.out.println("Enter loan #" + (i + 1) + " data ");
-		    System.out.print("Title? ");
-		    String title = sc.nextLine();
-		    System.out.print("Author? ");
-		    String author = sc.nextLine();
-		    System.out.print("Price per day? ");
-		    double pricePerDay = sc.nextDouble();
-		    sc.nextLine(); // ← consome o \n após nextDouble
-		    System.out.print("Date for get book? (DD/MM/YYYY): ");
-		    LocalDate startDate = LocalDate.parse(sc.next(), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-		    System.out.print("Date for return book? (DD/MM/YYYY): ");
-		    LocalDate due = LocalDate.parse(sc.next(), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-		    sc.nextLine(); // ← consome o \n após o último sc.next()
-
-			Book book = new Book(title, author, pricePerDay);
-			Loan loan = new Loan(startDate, due, book);
-			member.addLoan(loan);
-
-		}
-		System.out.println(member); // chama o toString do Member
-
-		for (Loan loan : member.getLoan()) {
-			System.out.println(loan); // chama o toString do Loan
+		catch (DateTimeParseException e) {
+			System.out.print("This option accepts only date format (DD/MM/YYYY), refresh and try again.");
 		}
 		sc.close();
 	}
